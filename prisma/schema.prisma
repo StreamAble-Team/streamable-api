@@ -6,48 +6,50 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider =      "postgresql"
+  url      =      env("DATABASE_URL")
 }
 
 model User {
   @@unique([userId])
-  userId    Int     @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  email String  @unique
-  name  String?
-  password String
-  username String @unique
-  lists UserLists[]
+  userId          Int       @id @default(autoincrement())
+  createdAt       DateTime  @default(now())
+  email           String    @unique
+  name            String?
+  password        String
+  username        String    @unique
+  token           String?
+  lists           UserLists[]
+  connections     UserConnections[]
 }
 
 model UserLists {
   @@unique([id])
   @@id([id])
-  userId      Int
-  id          Int  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  watched     Boolean
-  planToWatch Boolean
-  dropped     Boolean
-  watching    Boolean
-  user        User     @relation(fields: [userId], references: [userId])
-  episodes    Json
+  userId          Int
+  id              Int  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  watched         Boolean
+  planToWatch     Boolean
+  dropped         Boolean
+  watching        Boolean
+  user            User     @relation(fields: [userId], references: [userId])
+  episodes        Json
 }
 
 model Media {
   @@unique([id])
   @@id([id])
-  id          Int            
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  title       Json
-  description String
-  type        String
-  image       String
-  cover       String
-  episodes    Episode[]
+  id              Int            
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  title           Json
+  description     String
+  type            String
+  image           String
+  cover           String
+  episodes        Episode[]
 }
 
 model Episode {
@@ -65,3 +67,15 @@ model Episode {
   media       Media    @relation(fields: [mediaId], references: [id])
 }
 
+model UserConnections {
+  @@unique([id])
+  @@id([id])
+  id              Int
+  userId          Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  anilist         String?
+  mal             String?
+  kitsu           String?
+  user            User     @relation(fields: [userId], references: [userId])
+}

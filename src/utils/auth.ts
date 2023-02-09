@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 import { prisma } from "./prisma/client";
 
@@ -47,7 +48,7 @@ export const signup = async (
 };
 
 export const login = async (email: string, password: string) => {
-  // check if email and password are valid
+  // check if email
   const user = await prisma.user.findUnique({
     where: { email },
   });
@@ -58,7 +59,42 @@ export const login = async (email: string, password: string) => {
 
   if (!isPasswordCorrect) return "Email or password is incorrect";
 
-  return user;
+  // create jwt token
+  const secret = process.env.JWT_SECRET as string;
+  const token = jwt.sign({ id: user.userId }, secret, {
+    expiresIn: "60d",
+  });
+
+  // update user token
+  const updatedUser = await prisma.user.update({
+    where: { email },
+    data: {
+      token,
+    },
+  });
+
+  return updatedUser;
+};
+
+export const logout = async (id: number, token: string) => {
+  const user = await prisma.user.findUnique({
+    where: { userId: id },
+  });
+
+  if (!user) return "User not found";
+
+  if (user.token !== token) return "Token is not valid";
+
+  const updatedUser = await prisma.user.update({
+    where: { userId: id },
+    data: {
+      token: null,
+    },
+  });
+
+  if (!updatedUser) return "Error updating user";
+
+  return updatedUser;
 };
 
 export const getUser = async (id: number) => {
@@ -95,4 +131,30 @@ export const deleteUser = async (id: number) => {
   });
 
   return user;
+};
+
+export const resetPassword = async (email: string, newPassword: string) => {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) return "Email is not registered";
+
+  const isHashed = await bcrypt.compare(newPassword, newPassword);
+
+  if (!isHashed) return "Password is not encrypted";
+
+  //check if password does not match old password
+  const isPasswordCorrect = await bcrypt.compare(newPassword, user.password);
+
+  if (isPasswordCorrect) return "Password is the same as old password";
+
+  const updatedUser = await prisma.user.update({
+    where: { email },
+    data: {
+      password: newPassword,
+    },
+  });
+
+  return updatedUser;
 };

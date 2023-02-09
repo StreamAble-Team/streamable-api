@@ -1,5 +1,5 @@
 import { FastifyInstance, RegisterOptions } from "fastify";
-import { signup } from "../utils/signup";
+import { auth } from "../utils";
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get("/", async (request, reply) => {
@@ -13,7 +13,12 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       username: string;
     };
 
-    const user = await signup(email, password, username);
+    if (!email || !password || !username)
+      return reply
+        .code(400)
+        .send("Bad Request: Missing email, username or password");
+
+    const user = await auth.signup(email, password, username);
 
     return user;
   });

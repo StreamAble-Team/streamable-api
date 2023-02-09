@@ -1,4 +1,4 @@
 import * as utils from "./utils";
-import * as signup from "./signup";
+import * as auth from "./auth";
 
-export { utils, signup };
+export { utils, auth };
