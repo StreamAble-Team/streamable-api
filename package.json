@@ -1,7 +1,7 @@
 {
   "name": "streamable-api",
   "version": "0.0.1",
-  "main": "./src/main.js",
+  "main": "./src/main.ts",
   "author": "Tdanks2000",
   "license": "MIT",
   "scripts": {
