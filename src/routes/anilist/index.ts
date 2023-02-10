@@ -33,8 +33,6 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
           60 * 60 * 24
         );
 
-        if (data && perPage) data = data.slice(0, perPage);
-
         const res = data ? data : await anilist.search(query, page, perPage);
 
         return reply.code(200).send(res);
@@ -168,8 +166,6 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
           60 * 60 * 24
         );
 
-        if (data && perPage) data = data.slice(0, perPage);
-
         const res = data
           ? data
           : await anilist.fetchPopularAnime(page, perPage);
@@ -197,8 +193,6 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
           async () => await anilist.fetchTrendingAnime(page),
           60 * 60 * 24
         );
-
-        if (data && perPage) data = data.slice(0, perPage);
 
         const res = data
           ? data
@@ -235,8 +229,6 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
             ),
           60 * 60 * 24
         );
-
-        if (data && perPage) data = data.slice(0, perPage);
 
         const res = data
           ? data
@@ -280,8 +272,6 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
             ),
           60 * 60 * 24
         );
-
-        if (data && perPage) data = data.slice(0, perPage);
 
         const res = data
           ? data
