@@ -3,3 +3,7 @@ node_modules
 .env
 
 /prisma/**/migrations
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
