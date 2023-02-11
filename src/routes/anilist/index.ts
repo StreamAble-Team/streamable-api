@@ -5,7 +5,12 @@ import {
   RegisterOptions,
 } from "fastify";
 import { cache } from "../../utils";
-import { META, PROVIDERS_LIST, StreamingServers } from "@consumet/extensions";
+import {
+  Genres,
+  META,
+  PROVIDERS_LIST,
+  StreamingServers,
+} from "@consumet/extensions";
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get("/", async (request, reply) => {
@@ -282,6 +287,171 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
               perPage,
               "TV",
               ["START_DATE_DESC"]
+            );
+
+        return reply.code(200).send(res);
+      } catch (err) {
+        return reply.code(500).send({ error: (err as Error).message });
+      }
+    }
+  );
+
+  fastify.get(
+    "/advanced-search",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      let {
+        query,
+        page,
+        perPage,
+        type,
+        genres,
+        id,
+        format,
+        sort,
+        status,
+        year,
+        season,
+      } = request.query as {
+        query: string;
+        page: number;
+        perPage: number;
+        type: string;
+        genres: string | string[];
+        id: string;
+        format: string;
+        sort: string | string[];
+        status: string;
+        year: number;
+        season: string;
+      };
+
+      const anilist = new META.Anilist();
+
+      if (genres) {
+        JSON.parse(genres as string).forEach((genre: string) => {
+          if (!Object.values(Genres).includes(genre as Genres)) {
+            return reply
+              .status(400)
+              .send({ message: `${genre} is not a valid genre` });
+          }
+        });
+
+        genres = JSON.parse(genres as string);
+      }
+
+      if (sort) sort = JSON.parse(sort as string);
+
+      if (season)
+        if (!["WINTER", "SPRING", "SUMMER", "FALL"].includes(season))
+          return reply
+            .status(400)
+            .send({ message: `${season} is not a valid season` });
+
+      const res = await anilist.advancedSearch(
+        query,
+        type,
+        page,
+        perPage,
+        format,
+        sort as string[],
+        genres as string[],
+        id,
+        year,
+        status,
+        season
+      );
+
+      reply.status(200).send(res);
+    }
+  );
+
+  fastify.get(
+    "/airing-schedule",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      let {
+        page = 1,
+        perPage,
+        weekStart,
+        weekEnd,
+        notYetAired,
+      } = request.query as {
+        page: number;
+        perPage: number;
+        weekStart: number | string;
+        weekEnd: number | string;
+        notYetAired: boolean;
+      };
+
+      const anilist = new META.Anilist();
+
+      const res = await anilist.fetchAiringSchedule(
+        page,
+        perPage,
+        weekStart,
+        weekEnd,
+        notYetAired
+      );
+
+      reply.status(200).send(res);
+    }
+  );
+
+  fastify.get(
+    "/episodes/:id",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const now = new Date();
+      const today = now.getDay();
+
+      const { id } = request.params as { id: string };
+      let { provider, dub, fetchFiller } = request.query as {
+        provider: string;
+        dub: string | boolean;
+        fetchFiller: string | boolean;
+      };
+
+      let anilist = new META.Anilist();
+
+      if (typeof provider !== "undefined") {
+        const possibleProvider = PROVIDERS_LIST.ANIME.find(
+          (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
+        );
+
+        anilist = new META.Anilist(
+          possibleProvider,
+          typeof process.env.PROXIES !== "undefined"
+            ? {
+                url: JSON.parse(process.env.PROXIES!)[
+                  Math.random() * JSON.parse(process.env.PROXIES!).length
+                ],
+              }
+            : undefined
+        );
+      }
+
+      if (dub === "true" || dub === "1") dub = true;
+      else dub = false;
+
+      if (fetchFiller === "true" || fetchFiller === "1") fetchFiller = true;
+      else fetchFiller = false;
+
+      try {
+        let data = await cache.fetch(
+          `anilist:episodes;${id};${dub};${fetchFiller};${anilist.provider.name.toLowerCase()}`,
+          async () =>
+            anilist.fetchEpisodesListById(
+              id,
+              dub as boolean,
+              fetchFiller as boolean
+            ),
+          today === 0 || today === 6 ? 60 * 120 : (60 * 60) / 2
+        );
+
+        const res = data
+          ? data
+          : await anilist.fetchEpisodesListById(
+              id,
+              dub as boolean,
+              fetchFiller as boolean
             );
 
         return reply.code(200).send(res);
