@@ -149,6 +149,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
 
         return reply.code(200).send(data);
       } catch (err) {
+        console.log(err);
         return reply.code(500).send({ error: (err as Error).message });
       }
     }
