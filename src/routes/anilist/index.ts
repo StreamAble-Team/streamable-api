@@ -440,7 +440,9 @@ const generateAnilistMeta = (
     if (possibleProvider instanceof NineAnime) {
       possibleProvider = new ANIME.NineAnime(
         process.env?.NINE_ANIME_HELPER_URL,
-        undefined,
+        {
+          url: process.env?.NINE_ANIME_PROXY as string,
+        },
         process.env?.NINE_ANIME_HELPER_KEY as string
       );
     }
