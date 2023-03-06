@@ -79,7 +79,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       else fetchFiller = false;
 
       try {
-        const data = await cache.fetch(
+        let data = await cache.fetch(
           `anilist:info;${id};${isDub};${fetchFiller};${anilist.provider.name.toLowerCase()}`,
           async () =>
             await anilist.fetchAnimeInfo(
@@ -90,8 +90,13 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
           today === 0 || today === 6 ? 60 * 120 : (60 * 60) / 2
         );
 
+        data = data
+          ? data
+          : await anilist.fetchAnimeInfo(id, isDub, fetchFiller);
+
         return reply.code(200).send(data);
       } catch (err) {
+        console.log({ err });
         return reply.code(500).send({ error: (err as Error).message });
       }
     }
@@ -435,9 +440,7 @@ const generateAnilistMeta = (
     if (possibleProvider instanceof NineAnime) {
       possibleProvider = new ANIME.NineAnime(
         process.env?.NINE_ANIME_HELPER_URL,
-        {
-          url: process.env?.NINE_ANIME_PROXY as string,
-        },
+        undefined,
         process.env?.NINE_ANIME_HELPER_KEY as string
       );
     }
