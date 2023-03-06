@@ -9,7 +9,7 @@
     "dev": "nodemon ./src/main.ts"
   },
   "dependencies": {
-    "@consumet/extensions": "^1.4.15",
+    "@consumet/extensions": "https://github.com/consumet/consumet.ts.git",
     "@fastify/cors": "^8.2.0",
     "@fastify/formbody": "^7.4.0",
     "@prisma/client": "^4.11.0",

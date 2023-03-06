@@ -16,7 +16,7 @@ import NineAnime from "@consumet/extensions/dist/providers/anime/9anime";
 import Anilist from "@consumet/extensions/dist/providers/meta/anilist";
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  fastify.get("/", async (request, reply) => {
+  fastify.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
     return { hello: "world" };
   });
 
@@ -429,7 +429,7 @@ const generateAnilistMeta = (
 ): Anilist => {
   if (typeof provider !== "undefined") {
     let possibleProvider = PROVIDERS_LIST.ANIME.find(
-      (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
+      (p: any) => p.name.toLowerCase() === provider.toLocaleLowerCase()
     );
 
     if (possibleProvider instanceof NineAnime) {
