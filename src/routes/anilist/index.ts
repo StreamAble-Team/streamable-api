@@ -6,11 +6,14 @@ import {
 } from "fastify";
 import { cache } from "../../utils";
 import {
+  ANIME,
   Genres,
   META,
   PROVIDERS_LIST,
   StreamingServers,
 } from "@consumet/extensions";
+import NineAnime from "@consumet/extensions/dist/providers/anime/9anime";
+import Anilist from "@consumet/extensions/dist/providers/meta/anilist";
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get("/", async (request, reply) => {
@@ -67,15 +70,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       if (!id)
         return reply.code(400).send({ error: "ID parameter is required" });
 
-      let anilist = new META.Anilist();
-
-      if (typeof provider === "string") {
-        const possibleProvider = PROVIDERS_LIST.ANIME.find(
-          (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
-        );
-
-        anilist = new META.Anilist(possibleProvider);
-      }
+      let anilist = generateAnilistMeta(provider);
 
       if (isDub === "true" || isDub === "1") isDub = true;
       else isDub = false;
@@ -116,24 +111,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       if (server && !Object.values(StreamingServers).includes(server))
         return reply.code(400).send({ error: "Invalid server" });
 
-      let anilist = new META.Anilist();
-
-      if (typeof provider !== "undefined") {
-        const possibleProvider = PROVIDERS_LIST.ANIME.find(
-          (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
-        );
-
-        anilist = new META.Anilist(
-          possibleProvider,
-          typeof process.env.PROXIES !== "undefined"
-            ? {
-                url: JSON.parse(process.env.PROXIES!)[
-                  Math.random() * JSON.parse(process.env.PROXIES!).length
-                ],
-              }
-            : undefined
-        );
-      }
+      let anilist = generateAnilistMeta(provider);
 
       try {
         const data = await cache.fetch(
@@ -410,24 +388,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
         fetchFiller: string | boolean;
       };
 
-      let anilist = new META.Anilist();
-
-      if (typeof provider !== "undefined") {
-        const possibleProvider = PROVIDERS_LIST.ANIME.find(
-          (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
-        );
-
-        anilist = new META.Anilist(
-          possibleProvider,
-          typeof process.env.PROXIES !== "undefined"
-            ? {
-                url: JSON.parse(process.env.PROXIES!)[
-                  Math.random() * JSON.parse(process.env.PROXIES!).length
-                ],
-              }
-            : undefined
-        );
-      }
+      let anilist = generateAnilistMeta(provider);
 
       if (dub === "true" || dub === "1") dub = true;
       else dub = false;
@@ -461,6 +422,34 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       }
     }
   );
+};
+
+const generateAnilistMeta = (
+  provider: string | undefined = undefined
+): Anilist => {
+  if (typeof provider !== "undefined") {
+    let possibleProvider = PROVIDERS_LIST.ANIME.find(
+      (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
+    );
+
+    if (possibleProvider instanceof NineAnime) {
+      possibleProvider = new ANIME.NineAnime(
+        process.env?.NINE_ANIME_HELPER_URL,
+        {
+          url: process.env?.NINE_ANIME_PROXY as string,
+        },
+        process.env?.NINE_ANIME_HELPER_KEY as string
+      );
+    }
+
+    return new META.Anilist(possibleProvider, {
+      url: process.env.PROXY as string | string[],
+    });
+  } else {
+    return new Anilist(undefined, {
+      url: process.env.PROXY as string | string[],
+    });
+  }
 };
 
 export default routes;
