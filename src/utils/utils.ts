@@ -84,3 +84,21 @@ export const formatData = (data: any): IMediaResult => {
 
   return toReturn;
 };
+
+export const sortQualities = (qualities: string[]): string[] => {
+  const order = ["1080p", "480p", "360p", "720p", "default", "backup"];
+
+  qualities.sort((a, b) => {
+    const indexA = order.indexOf(a);
+    const indexB = order.indexOf(b);
+
+    // If a or b is not found in the order array, place it at the end
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+
+    // Compare the indexes to determine the sort order
+    return indexA - indexB;
+  });
+
+  return qualities;
+};

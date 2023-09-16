@@ -1,10 +1,9 @@
 import { FastifyInstance, RegisterOptions } from "fastify";
 
 import list from "./list";
-import anilist from "./anilist";
-import anilistManga from "./anilist/manga";
+import { anilist, anilistManga, aniskip } from "./info";
+import { ann } from "./news";
 
-import aniskip from "./aniskip";
 import Providers from "./utils/providers";
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
@@ -12,11 +11,21 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
     return { message: "Hello World" };
   });
 
-  await fastify.register(list, { prefix: "/list" });
+  /**
+   * INFO
+   */
   await fastify.register(anilist, { prefix: "/anilist" });
   await fastify.register(anilistManga, { prefix: "/anilist-manga" });
   await fastify.register(aniskip, { prefix: "/aniskip" });
 
+  /**
+   * NEWS
+   */
+  await fastify.register(ann, { prefix: "/ann" });
+
+  /**
+   * UTILS
+   */
   await fastify.register(new Providers().getProviders);
 };
 

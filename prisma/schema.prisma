@@ -6,56 +6,57 @@ generator client {
 }
 
 datasource db {
-  provider =      "postgresql"
-  url      =      env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
+  userId      Int               @id @default(autoincrement())
+  createdAt   DateTime          @default(now())
+  email       String            @unique
+  name        String?
+  password    String
+  username    String            @unique
+  token       String?
+  lists       UserLists[]
+  connections UserConnections[]
+
   @@unique([userId])
-  userId          Int       @id @default(autoincrement())
-  createdAt       DateTime  @default(now())
-  email           String    @unique
-  name            String?
-  password        String
-  username        String    @unique
-  token           String?
-  lists           UserLists[]
-  connections     UserConnections[]
 }
 
 model UserLists {
-  @@unique([id])
+  userId      Int
+  id          Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  watched     Boolean
+  planToWatch Boolean
+  dropped     Boolean
+  watching    Boolean
+  user        User     @relation(fields: [userId], references: [userId])
+  episodes    Json
+
   @@id([id])
-  userId          Int
-  id              Int  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  watched         Boolean
-  planToWatch     Boolean
-  dropped         Boolean
-  watching        Boolean
-  user            User     @relation(fields: [userId], references: [userId])
-  episodes        Json
+  @@unique([id])
 }
 
 model Media {
-  @@unique([id])
+  id          Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       Json
+  description String
+  type        String
+  image       String
+  cover       String
+  episodes    Episode[]
+
   @@id([id])
-  id              Int            
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  title           Json
-  description     String
-  type            String
-  image           String
-  cover           String
-  episodes        Episode[]
+  @@unique([id])
 }
 
 model Episode {
-  @@unique([id])
-  @@id([id])
-  id          Int     
+  id          Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   title       String
@@ -65,17 +66,21 @@ model Episode {
   image       String
   mediaId     Int
   media       Media    @relation(fields: [mediaId], references: [id])
+
+  @@id([id])
+  @@unique([id])
 }
 
 model UserConnections {
-  @@unique([id])
+  id        Int
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  anilist   String?
+  mal       String?
+  kitsu     String?
+  user      User     @relation(fields: [userId], references: [userId])
+
   @@id([id])
-  id              Int
-  userId          Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  anilist         String?
-  mal             String?
-  kitsu           String?
-  user            User     @relation(fields: [userId], references: [userId])
+  @@unique([id, userId])
 }
