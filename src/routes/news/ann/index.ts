@@ -12,7 +12,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       let data = await cache.fetch(
         `ann:recent-feeds:${topic}`,
         async () => await ann.fetchNewsFeeds(topic),
-        60 * 60 * 3
+        60 * 60 * 1
       );
 
       const res = data ? data : await ann.fetchNewsFeeds(topic);
