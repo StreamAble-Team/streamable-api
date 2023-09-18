@@ -5,8 +5,8 @@
   "author": "IMakeStuff",
   "license": "MIT",
   "scripts": {
-    "start": "tsc && node ./dist/main.js",
-    "dev": "nodemon ./src/main.ts"
+    "start": "tsc && chcp 65001 && node ./dist/main.js",
+    "dev": "chcp 65001 && nodemon ./src/main.ts"
   },
   "dependencies": {
     "@consumet/extensions": "https://github.com/tdanks2000/consumet.ts.git",
@@ -19,7 +19,9 @@
     "dotenv": "^16.3.1",
     "fastify": "^4.21.0",
     "ioredis": "^5.3.2",
-    "jsonwebtoken": "^9.0.1"
+    "jsonwebtoken": "^9.0.1",
+    "pino": "^8.15.1",
+    "pino-pretty": "^10.2.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",

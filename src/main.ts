@@ -6,13 +6,14 @@ import FastifyCors from "@fastify/cors";
 import bodyParser from "@fastify/formbody";
 
 import routes from "./routes";
+import { log } from "./utils";
 
 const PORT = Number(process.env.PORT) || 3000;
 
 (async () => {
   const app = Fastify({
     maxParamLength: 1000,
-    logger: true,
+    logger: log,
   });
 
   app.register(FastifyCors, {
@@ -29,6 +30,5 @@ const PORT = Number(process.env.PORT) || 3000;
       app.log.error(err);
       process.exit(1);
     }
-    console.log(`🚀 server listening on ${address}`);
   });
 })();

@@ -4,3 +4,5 @@ import redis from "./redis/client";
 import * as cache from "./redis/cache";
 
 export { utils, auth, redis, cache };
+
+export * from "./logger";
