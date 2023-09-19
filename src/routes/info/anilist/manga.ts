@@ -1,11 +1,14 @@
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from "fastify";
-import { META } from "@consumet/extensions";
+import { META, MediaStatus, IMangaResult, ISearch } from "@consumet/extensions";
 import { PROVIDERS_LIST } from "@consumet/extensions";
+
+import { Anilist } from "@tdanks2000/anilist-wrapper";
 
 import { cache } from "../../../utils";
 
 const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
   let anilist = new META.Anilist.Manga();
+  let anilistD = new Anilist().search;
 
   fastify.get("/search/:query", async (request: FastifyRequest, reply: FastifyReply) => {
     let { query } = request.params as { query: string };
@@ -61,6 +64,114 @@ const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
     }
   });
 
+  fastify.get("/trending", async (request: FastifyRequest, reply: FastifyReply) => {
+    const { page = 1, perPage } = request.query as {
+      page: number;
+      perPage: number;
+    };
+
+    try {
+      let data = await cache.fetch(
+        `anilist:manga:tredning;${page}`,
+        async () =>
+          convert_result(
+            await anilistD.advanced_manga({
+              page,
+              size: 50,
+              sort: ["TRENDING_DESC"],
+            })
+          ),
+        60 * 60 * 24
+      );
+
+      let res = data
+        ? data
+        : convert_result(
+            await anilistD.advanced_manga({
+              page,
+              size: perPage,
+              sort: ["TRENDING_DESC"],
+            })
+          );
+
+      reply.code(200).send(res);
+    } catch (err) {
+      reply.status(500).send({ error: err });
+    }
+  });
+
+  fastify.get("/popular", async (request: FastifyRequest, reply: FastifyReply) => {
+    const { page = 1, perPage } = request.query as {
+      page: number;
+      perPage: number;
+    };
+
+    try {
+      let data = await cache.fetch(
+        `anilist:manga:popular;${page}`,
+        async () =>
+          convert_result(
+            await anilistD.advanced_manga({
+              page,
+              size: 50,
+              sort: ["POPULARITY_DESC"],
+            })
+          ),
+        60 * 60 * 24
+      );
+
+      let res = data
+        ? data
+        : convert_result(
+            await anilistD.advanced_manga({
+              page,
+              size: perPage,
+              sort: ["POPULARITY_DESC"],
+            })
+          );
+
+      reply.code(200).send(res);
+    } catch (err) {
+      reply.status(500).send({ error: err });
+    }
+  });
+
+  fastify.get("/top-rated", async (request: FastifyRequest, reply: FastifyReply) => {
+    const { page = 1, perPage } = request.query as {
+      page: number;
+      perPage: number;
+    };
+
+    try {
+      let data = await cache.fetch(
+        `anilist:manga:top-rated;${page}`,
+        async () =>
+          convert_result(
+            await anilistD.advanced_manga({
+              page,
+              size: 50,
+              sort: ["SCORE_DESC"],
+            })
+          ),
+        60 * 60 * 24
+      );
+
+      let res = data
+        ? data
+        : convert_result(
+            await anilistD.advanced_manga({
+              page,
+              size: perPage,
+              sort: ["SCORE_DESC"],
+            })
+          );
+
+      reply.code(200).send(res);
+    } catch (err) {
+      reply.status(500).send({ error: err });
+    }
+  });
+
   fastify.get("/read", async (request: FastifyRequest, reply: FastifyReply) => {
     const { chapterId, provider } = request.query as {
       chapterId: string;
@@ -91,6 +202,51 @@ const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
       reply.status(500).send({ error: err });
     }
   });
+};
+
+const convert_result = (data: any) => {
+  const res: ISearch<IMangaResult> = {
+    currentPage: data.data.Page.pageInfo.currentPage,
+    hasNextPage: data.data.Page.pageInfo.hasNextPage,
+    results: data.data.Page.media.map(
+      (item: any): IMangaResult => ({
+        id: item.id.toString(),
+        malId: item.idMal,
+        title:
+          {
+            romaji: item.title.romaji,
+            english: item.title.english,
+            native: item.title.native,
+            userPreferred: item.title.userPreferred,
+          } || item.title.romaji,
+        status:
+          item.status == "RELEASING"
+            ? MediaStatus.ONGOING
+            : item.status == "FINISHED"
+            ? MediaStatus.COMPLETED
+            : item.status == "NOT_YET_RELEASED"
+            ? MediaStatus.NOT_YET_AIRED
+            : item.status == "CANCELLED"
+            ? MediaStatus.CANCELLED
+            : item.status == "HIATUS"
+            ? MediaStatus.HIATUS
+            : MediaStatus.UNKNOWN,
+        image: item.coverImage?.extraLarge ?? item.coverImage?.large ?? item.coverImage?.medium,
+        cover: item.bannerImage,
+        popularity: item.popularity,
+        description: item.description,
+        rating: item.averageScore,
+        genres: item.genres,
+        color: item.coverImage?.color,
+        totalChapters: item.chapters,
+        volumes: item.volumes,
+        type: item.format,
+        releaseDate: item.seasonYear,
+      })
+    ),
+  };
+
+  return res;
 };
 
 export default routes;

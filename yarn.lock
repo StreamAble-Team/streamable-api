@@ -4,7 +4,7 @@
 
 "@consumet/extensions@https://github.com/tdanks2000/consumet.ts.git":
   version "1.5.1"
-  resolved "https://github.com/tdanks2000/consumet.ts.git#8c37f28b222d136fe2aa82d5803bc86d0fab1d60"
+  resolved "https://github.com/tdanks2000/consumet.ts.git#2d070a912ecb9a084545bb3ee0959eb940218bd7"
   dependencies:
     ascii-url-encoder "^1.2.0"
     axios "^0.27.2"
@@ -115,6 +115,13 @@
   version "5.3.1"
   resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-5.3.1.tgz#53cc72a5ed176dc27d22305fe5569c64cc78b381"
   integrity sha512-6QkILNyfeeN67BNEPEtkgh3Xo2tm6D7V+UhrkBbRHqKw9CTaz/vvTP/ROwYSP/3JT2MtIutZm/EnhxUiuOPVDA==
+
+"@tdanks2000/anilist-wrapper@1.0.18":
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/@tdanks2000/anilist-wrapper/-/anilist-wrapper-1.0.18.tgz#14785d25e2e0362688f8216c848a0a9a0649baa7"
+  integrity sha512-7r4lqtH+C++zvhuuBWLqkTtkJhYVZ2eXUPsmfdUq9huW2IX1QKjCiyICgoy5aZJmuO7xOYxgF+nf+WToGemt4w==
+  dependencies:
+    abort-controller "^3.0.0"
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"

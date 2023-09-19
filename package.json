@@ -13,6 +13,7 @@
     "@fastify/cors": "^8.3.0",
     "@fastify/formbody": "^7.4.0",
     "@prisma/client": "^5.1.0",
+    "@tdanks2000/anilist-wrapper": "1.0.18",
     "apollotv-providers": "git+https://github.com/TDanks2000/apollotv-extensions.git",
     "axios": "^0.27.2",
     "bcrypt": "^5.1.0",
