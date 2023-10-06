@@ -245,7 +245,7 @@ ansi-regex@^5.0.1:
 
 "apollotv-providers@git+https://github.com/TDanks2000/apollotv-extensions.git":
   version "1.0.0"
-  resolved "git+https://github.com/TDanks2000/apollotv-extensions.git#960828dcca95a0a62ae8dde241b542cabc571539"
+  resolved "git+https://github.com/TDanks2000/apollotv-extensions.git#49962f85d92fe7375f06868fa0ccdc7146e08fd2"
   dependencies:
     "@tdanks2000/anilist-wrapper" "^1.0.18"
     axios "0.27.2"
