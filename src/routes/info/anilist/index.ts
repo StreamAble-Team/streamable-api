@@ -66,7 +66,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
 
     try {
       let data = await cache.fetch(
-        `anilist:infov2;${id};${isDub};${fetchFiller};${anilist.provider.metaData.name.toLowerCase()}`,
+        `anilist:info;${id};${isDub};${fetchFiller};${anilist.provider.metaData.name.toLowerCase()}`,
         async () => await anilist.getMediaInfo(id, isDub as boolean),
         today === 0 || today === 6 ? 60 * 120 : (60 * 60) / 2
       );
