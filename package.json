@@ -15,7 +15,7 @@
     "@prisma/client": "^5.3.1",
     "@tdanks2000/anilist-wrapper": "1.0.18",
     "apollotv-providers": "git+https://github.com/TDanks2000/apollotv-extensions.git",
-    "axios": "^1.5.1",
+    "axios": "^0.27.2",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
     "fastify": "^4.21.0",
