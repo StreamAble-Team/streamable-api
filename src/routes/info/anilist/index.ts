@@ -2,11 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest, RegisterOptions } from "
 import { cache } from "../../../utils";
 import { ANIME, Genres, META, PROVIDERS_LIST, StreamingServers } from "@consumet/extensions";
 import NineAnime from "@consumet/extensions/dist/providers/anime/9anime";
-import CAnilist from "@consumet/extensions/dist/providers/meta/anilist";
-
-import AAnilist from "apollotv-providers/dist/extensions/info/anilist";
-
-import { INFO } from "apollotv-providers";
+import Anilist from "@consumet/extensions/dist/providers/meta/anilist";
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
@@ -56,7 +52,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
 
     if (!id) return reply.code(400).send({ error: "ID parameter is required" });
 
-    let anilist = generateAnilistMetav2();
+    let anilist = generateAnilistMeta(provider);
 
     if (isDub === "true" || isDub === "1") isDub = true;
     else isDub = false;
@@ -66,12 +62,12 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
 
     try {
       let data = await cache.fetch(
-        `anilist:info;${id};${isDub};${fetchFiller};${anilist.provider.metaData.name.toLowerCase()}`,
-        async () => await anilist.getMediaInfo(id, isDub as boolean),
+        `anilist:info;${id};${isDub};${fetchFiller};${anilist.provider.name.toLowerCase()}`,
+        async () => await anilist.fetchAnimeInfo(id, isDub as boolean, fetchFiller as boolean),
         today === 0 || today === 6 ? 60 * 120 : (60 * 60) / 2
       );
 
-      data = data ? data : await anilist.getMediaInfo(id, isDub);
+      data = data ? data : await anilist.fetchAnimeInfo(id, isDub, fetchFiller);
 
       return reply.code(200).send(data);
     } catch (err) {
@@ -373,7 +369,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   });
 };
 
-const generateAnilistMeta = (provider: string | undefined = undefined): CAnilist => {
+const generateAnilistMeta = (provider: string | undefined = undefined): Anilist => {
   if (typeof provider !== "undefined") {
     let possibleProvider = PROVIDERS_LIST.ANIME.find(
       (p: any) => p.name.toLowerCase() === provider.toLocaleLowerCase()
@@ -393,14 +389,10 @@ const generateAnilistMeta = (provider: string | undefined = undefined): CAnilist
       url: process.env.PROXY as string | string[],
     });
   } else {
-    return new CAnilist(undefined, {
+    return new Anilist(undefined, {
       url: process.env.PROXY as string | string[],
     });
   }
-};
-
-const generateAnilistMetav2 = (): AAnilist => {
-  return new INFO.Anilist(undefined, process.env.ANIMAPPED_API_KEY!);
 };
 
 export default routes;
