@@ -5,6 +5,7 @@
   "author": "IMakeStuff",
   "license": "MIT",
   "scripts": {
+    "update": "git pull && rm -rf node_modules && yarn && pm2 restart api.streamable.moe",
     "start": "tsc && node ./dist/main.js",
     "dev": "chcp 65001 && nodemon ./src/main.ts "
   },
