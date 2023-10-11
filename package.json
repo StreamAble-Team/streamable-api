@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "start": "tsc && node ./dist/main.js",
-    "dev": "chcp 65001 && nodemon ./src/main.ts"
+    "dev": "chcp 65001 && nodemon ./src/main.ts "
   },
   "dependencies": {
     "@consumet/extensions": "https://github.com/tdanks2000/consumet.ts.git",
@@ -14,11 +14,13 @@
     "@fastify/formbody": "^7.4.0",
     "@prisma/client": "^5.3.1",
     "@tdanks2000/anilist-wrapper": "1.0.18",
+    "@tdanks2000/fancyconsolelog": "^0.1.0",
     "apollotv-providers": "git+https://github.com/TDanks2000/apollotv-extensions.git",
     "axios": "^0.27.2",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
     "fastify": "^4.21.0",
+    "fastify-socket.io": "^5.0.0",
     "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",
     "pino": "^8.15.4",

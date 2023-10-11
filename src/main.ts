@@ -1,20 +1,20 @@
 require("dotenv").config();
 
-import Fastify from "fastify";
+import { fastifySocketIO } from "./utils/sockets";
 import FastifyCors from "@fastify/cors";
 
 import bodyParser from "@fastify/formbody";
 
 import routes from "./routes";
-import { log } from "./utils";
+import { app } from "./utils";
 
+import Console from "@tdanks2000/fancyconsolelog";
 const PORT = Number(process.env.PORT) || 3000;
 
+const console = new Console();
+
 (async () => {
-  const app = Fastify({
-    maxParamLength: 1000,
-    logger: log,
-  });
+  app.register(fastifySocketIO);
 
   app.register(FastifyCors, {
     origin: "*",
@@ -24,6 +24,8 @@ const PORT = Number(process.env.PORT) || 3000;
   app.register(routes, {
     prefix: "/api",
   });
+
+  require("./sockets");
 
   app.listen({ port: PORT, host: "0.0.0.0" }, (err, address) => {
     if (err) {

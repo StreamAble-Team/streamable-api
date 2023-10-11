@@ -400,7 +400,6 @@ const generateAnilistMeta = (provider: string | undefined = undefined): CAnilist
 };
 
 const generateAnilistMetav2 = (): AAnilist => {
-  console.log(process.env.ANIMAPPED_API_KEY!);
   return new INFO.Anilist(undefined, process.env.ANIMAPPED_API_KEY!);
 };
 

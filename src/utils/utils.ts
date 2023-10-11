@@ -1,6 +1,6 @@
 import { META } from "@consumet/extensions";
 
-import { IMediaResult } from "../models/types";
+import { IMediaResult } from "../@types";
 import { prisma } from "./prisma/client";
 
 const anilist = new META.Anilist();
@@ -48,11 +48,7 @@ export const getMedia = async (id: number) => {
   return media;
 };
 
-export const addToUserList = async (
-  userId: number,
-  mediaId: number,
-  data: IMediaResult
-) => {
+export const addToUserList = async (userId: number, mediaId: number, data: IMediaResult) => {
   const media = await getMedia(mediaId);
 
   if (!media) {

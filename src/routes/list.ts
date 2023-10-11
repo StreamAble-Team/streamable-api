@@ -1,5 +1,5 @@
 import { FastifyInstance, RegisterOptions } from "fastify";
-import { IAnimeResult, IMediaResult, WatchingStatus } from "../models/types";
+import { IAnimeResult, IMediaResult, WatchingStatus } from "../@types";
 
 import { utils } from "../utils";
 

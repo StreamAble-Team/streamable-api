@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from "
 import { META, MediaStatus, IMangaResult, ISearch } from "@consumet/extensions";
 import { PROVIDERS_LIST } from "@consumet/extensions";
 
+import { INFO } from "apollotv-providers";
 import { Anilist } from "@tdanks2000/anilist-wrapper";
 
 import { cache } from "../../../utils";
@@ -9,6 +10,8 @@ import { cache } from "../../../utils";
 const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
   let anilist = new META.Anilist.Manga();
   let anilistD = new Anilist().search;
+
+  let anilistA = new INFO.Anilist().Manga;
 
   fastify.get("/search/:query", async (request: FastifyRequest, reply: FastifyReply) => {
     let { query } = request.params as { query: string };
@@ -41,24 +44,35 @@ const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
 
     if (!id) return reply.code(400).send({ error: "ID parameter is required" });
 
+    const isMangaSee =
+      typeof provider !== "undefined" && provider.toLowerCase().includes("mangasee");
+
     if (typeof provider !== "undefined") {
-      const possibleProvider = PROVIDERS_LIST.MANGA.find(
-        (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
-      );
-      anilist = new META.Anilist.Manga(possibleProvider);
+      if (!isMangaSee) {
+        const possibleProvider = PROVIDERS_LIST.MANGA.find(
+          (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
+        );
+        anilist = new META.Anilist.Manga(possibleProvider);
+      }
     }
 
     try {
       let data = await cache.fetch(
         `anilist:manga:info;${id};${anilist.provider.name.toLowerCase()}`,
-        async () => await anilist.fetchMangaInfo(id),
+        async () =>
+          isMangaSee ? await anilistA.getMediaInfo(id) : await anilist.fetchMangaInfo(id),
         today === 0 || today === 6 ? 60 * 120 : (60 * 60) / 2
       );
 
-      let res = data ? data : await anilist.fetchMangaInfo(id);
+      let res = data
+        ? data
+        : isMangaSee
+        ? await anilistA.getMediaInfo(id)
+        : await anilist.fetchMangaInfo(id);
 
       reply.code(200).send(res);
       anilist = new META.Anilist.Manga();
+      anilistA = new INFO.Anilist().Manga;
     } catch (err) {
       reply.status(500).send({ error: err });
     }
