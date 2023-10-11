@@ -45,7 +45,8 @@ const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
     if (!id) return reply.code(400).send({ error: "ID parameter is required" });
 
     const isMangaSee =
-      typeof provider !== "undefined" && provider.toLowerCase().includes("mangasee");
+      (typeof provider !== "undefined" && provider.toLowerCase().includes("mangasee")) ||
+      anilist.provider.name.toLowerCase().includes("mangasee");
 
     if (typeof provider !== "undefined") {
       if (!isMangaSee) {
@@ -194,21 +195,34 @@ const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
 
     if (!chapterId) return reply.code(400).send({ error: "Chapter ID is required" });
 
+    const isMangaSee =
+      (typeof provider !== "undefined" && provider.toLowerCase().includes("mangasee")) ||
+      anilist.provider.name.toLowerCase().includes("mangasee");
+
     if (typeof provider !== "undefined") {
-      const possibleProvider = PROVIDERS_LIST.MANGA.find(
-        (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
-      );
-      anilist = new META.Anilist.Manga(possibleProvider);
+      if (!isMangaSee) {
+        const possibleProvider = PROVIDERS_LIST.MANGA.find(
+          (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
+        );
+        anilist = new META.Anilist.Manga(possibleProvider);
+      }
     }
 
     try {
       let data = await cache.fetch(
         `anilist:manga:read;${chapterId};${anilist.provider.name.toLowerCase()}`,
-        async () => await anilist.fetchChapterPages(chapterId),
+        async () =>
+          isMangaSee
+            ? await anilistA.getChapterPages(chapterId)
+            : await anilist.fetchChapterPages(chapterId),
         600
       );
 
-      let res = data ? data : await anilist.fetchChapterPages(chapterId);
+      let res = data
+        ? data
+        : isMangaSee
+        ? await anilistA.getChapterPages(chapterId)
+        : await anilist.fetchChapterPages(chapterId);
 
       reply.code(200).send(res);
       anilist = new META.Anilist.Manga();
