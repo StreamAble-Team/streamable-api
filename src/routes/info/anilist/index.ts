@@ -1,12 +1,10 @@
 import { FastifyInstance, FastifyReply, FastifyRequest, RegisterOptions } from "fastify";
 import { cache } from "../../../utils";
-import { ANIME, Genres, META, PROVIDERS_LIST, StreamingServers } from "@consumet/extensions";
-import NineAnime from "@consumet/extensions/dist/providers/anime/9anime";
-import CAnilist from "@consumet/extensions/dist/providers/meta/anilist";
+import { Genres, META, StreamingServers } from "@consumet/extensions";
 
-import AAnilist from "apollotv-providers/dist/extensions/info/anilist";
+import Anilist from "apollotv-providers/dist/extensions/info/anilist";
 
-import { INFO } from "apollotv-providers";
+import { EXTENSION_LIST, INFO } from "apollotv-providers";
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
@@ -22,7 +20,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
 
     if (!query) return reply.code(400).send({ error: "Query parameter is required" });
 
-    const anilist = new META.Anilist();
+    const anilist = new INFO.Anilist();
 
     try {
       let data = await cache.fetch(
@@ -56,7 +54,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
 
     if (!id) return reply.code(400).send({ error: "ID parameter is required" });
 
-    let anilist = generateAnilistMetav2();
+    let anilist = generateAnilistMeta(provider);
 
     if (isDub === "true" || isDub === "1") isDub = true;
     else isDub = false;
@@ -96,12 +94,42 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
 
     try {
       const data = await cache.fetch(
-        `anilist:watch;${episodeId};${anilist.provider.name.toLowerCase()};${server}`,
-        async () => anilist.fetchEpisodeSources(episodeId, server),
+        `anilist:watch;${episodeId};${anilist.provider.metaData.name.toLowerCase()};${server}`,
+        async () => anilist.getMediaSources(episodeId, server),
         600
       );
 
-      if (!data) return reply.code(200).send(await anilist.fetchEpisodeSources(episodeId, server));
+      if (!data) return reply.code(200).send(await anilist.getMediaSources(episodeId, server));
+
+      return reply.code(200).send(data);
+    } catch (err) {
+      console.log(err);
+      return reply.code(500).send({ error: (err as Error).message });
+    }
+  });
+
+  fastify.get("/watch", async (request: FastifyRequest, reply: FastifyReply) => {
+    const { provider, server, episodeId } = request.query as {
+      provider: string;
+      server: StreamingServers;
+      episodeId?: string;
+    };
+
+    if (!episodeId) return reply.code(400).send({ error: "ID is required" });
+
+    if (server && !Object.values(StreamingServers).includes(server))
+      return reply.code(400).send({ error: "Invalid server" });
+
+    let anilist = generateAnilistMeta(provider);
+
+    try {
+      const data = await cache.fetch(
+        `anilist:watch;${episodeId};${anilist.provider.metaData.name.toLowerCase()};${server}`,
+        async () => anilist.getMediaSources(episodeId, server),
+        600
+      );
+
+      if (!data) return reply.code(200).send(await anilist.getMediaSources(episodeId, server));
 
       return reply.code(200).send(data);
     } catch (err) {
@@ -228,7 +256,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
         season: string;
       };
 
-    const anilist = new META.Anilist();
+    const anilist = new INFO.Anilist();
 
     if (genres) {
       JSON.parse(genres as string).forEach((genre: string) => {
@@ -246,19 +274,19 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       if (!["WINTER", "SPRING", "SUMMER", "FALL"].includes(season))
         return reply.status(400).send({ message: `${season} is not a valid season` });
 
-    const res = await anilist.advancedSearch(
+    const res = await anilist.advancedSearch({
       query,
       type,
       page,
       perPage,
       format,
-      sort as string[],
-      genres as string[],
+      sort: sort as string[],
+      genres: genres as string[],
       id,
       year,
       status,
-      season
-    );
+      season,
+    });
 
     reply.status(200).send(res);
   });
@@ -279,7 +307,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
         season: string;
       };
 
-    const anilist = new META.Anilist();
+    const anilist = new INFO.Anilist();
 
     if (genres) {
       JSON.parse(genres as string).forEach((genre: string) => {
@@ -297,19 +325,19 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       if (!["WINTER", "SPRING", "SUMMER", "FALL"].includes(season))
         return reply.status(400).send({ message: `${season} is not a valid season` });
 
-    const res = await anilist.advancedSearch(
+    const res = await anilist.advancedSearch({
       query,
       type,
       page,
       perPage,
       format,
-      sort as string[],
-      genres as string[],
+      sort: sort as string[],
+      genres: genres as string[],
       id,
       year,
       status,
-      season
-    );
+      season,
+    });
 
     reply.status(200).send(res);
   });
@@ -336,71 +364,56 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
     reply.status(200).send(res);
   });
 
-  fastify.get("/episodes/:id", async (request: FastifyRequest, reply: FastifyReply) => {
-    const now = new Date();
-    const today = now.getDay();
+  // fastify.get("/episodes/:id", async (request: FastifyRequest, reply: FastifyReply) => {
+  //   const now = new Date();
+  //   const today = now.getDay();
 
-    const { id } = request.params as { id: string };
-    let { provider, dub, fetchFiller } = request.query as {
-      provider: string;
-      dub: string | boolean;
-      fetchFiller: string | boolean;
-    };
+  //   const { id } = request.params as { id: string };
+  //   let { provider, dub, fetchFiller } = request.query as {
+  //     provider: string;
+  //     dub: string | boolean;
+  //     fetchFiller: string | boolean;
+  //   };
 
-    let anilist = generateAnilistMeta(provider);
+  //   let anilist = generateAnilistMeta(provider);
 
-    if (dub === "true" || dub === "1") dub = true;
-    else dub = false;
+  //   if (dub === "true" || dub === "1") dub = true;
+  //   else dub = false;
 
-    if (fetchFiller === "true" || fetchFiller === "1") fetchFiller = true;
-    else fetchFiller = false;
+  //   if (fetchFiller === "true" || fetchFiller === "1") fetchFiller = true;
+  //   else fetchFiller = false;
 
-    try {
-      let data = await cache.fetch(
-        `anilist:episodes;${id};${dub};${fetchFiller};${anilist.provider.name.toLowerCase()}`,
-        async () => anilist.fetchEpisodesListById(id, dub as boolean, fetchFiller as boolean),
-        today === 0 || today === 6 ? 60 * 120 : (60 * 60) / 2
-      );
+  //   try {
+  //     let data = await cache.fetch(
+  //       `anilist:episodes;${id};${dub};${fetchFiller};${anilist.provider.metaData.name.toLowerCase()}`,
+  //       async () => anilist.fetchEpisodesListById(id, dub as boolean, fetchFiller as boolean),
+  //       today === 0 || today === 6 ? 60 * 120 : (60 * 60) / 2
+  //     );
 
-      const res = data
-        ? data
-        : await anilist.fetchEpisodesListById(id, dub as boolean, fetchFiller as boolean);
+  //     const res = data
+  //       ? data
+  //       : await anilist.fetchEpisodesListById(id, dub as boolean, fetchFiller as boolean);
 
-      return reply.code(200).send(res);
-    } catch (err) {
-      return reply.code(500).send({ error: (err as Error).message });
-    }
-  });
+  //     return reply.code(200).send(res);
+  //   } catch (err) {
+  //     return reply.code(500).send({ error: (err as Error).message });
+  //   }
+  // });
 };
 
-const generateAnilistMeta = (provider: string | undefined = undefined): CAnilist => {
-  if (typeof provider !== "undefined") {
-    let possibleProvider = PROVIDERS_LIST.ANIME.find(
-      (p: any) => p.name.toLowerCase() === provider.toLocaleLowerCase()
-    );
+const generateAnilistMeta = (provider: string | undefined = undefined): Anilist => {
+  const ANIMAPPED_KEY = process.env.ANIMAPPED_API_KEY;
 
-    if (possibleProvider instanceof NineAnime) {
-      possibleProvider = new ANIME.NineAnime(
-        process.env?.NINE_ANIME_HELPER_URL,
-        {
-          url: process.env?.NINE_ANIME_PROXY as string,
-        },
-        process.env?.NINE_ANIME_HELPER_KEY as string
-      );
-    }
-
-    return new META.Anilist(possibleProvider, {
-      url: process.env.PROXY as string | string[],
-    });
-  } else {
-    return new CAnilist(undefined, {
-      url: process.env.PROXY as string | string[],
-    });
+  if (typeof provider === "undefined") {
+    return new INFO.Anilist(undefined, ANIMAPPED_KEY);
   }
-};
 
-const generateAnilistMetav2 = (): AAnilist => {
-  return new INFO.Anilist(undefined, process.env.ANIMAPPED_API_KEY!);
+  let possibleProvider = EXTENSION_LIST.ANIME.find(
+    (p) => p.metaData.name.toLowerCase() === provider.toLocaleLowerCase()
+  );
+  console.log(possibleProvider!);
+
+  return new INFO.Anilist(possibleProvider, ANIMAPPED_KEY);
 };
 
 export default routes;

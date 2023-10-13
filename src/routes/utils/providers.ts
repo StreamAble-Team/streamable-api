@@ -1,38 +1,23 @@
-import { PROVIDERS_LIST } from "@consumet/extensions";
-import {
-  FastifyRequest,
-  FastifyReply,
-  FastifyInstance,
-  RegisterOptions,
-} from "fastify";
+import { EXTENSION_LIST } from "apollotv-providers";
+import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from "fastify";
 
 type ProvidersRequest = FastifyRequest<{
-  Querystring: { type: keyof typeof PROVIDERS_LIST };
+  Querystring: { type: keyof typeof EXTENSION_LIST };
 }>;
 
 export default class Providers {
-  public getProviders = async (
-    fastify: FastifyInstance,
-    options: RegisterOptions
-  ) => {
+  public getProviders = async (fastify: FastifyInstance, options: RegisterOptions) => {
     fastify.get(
       "/utils/providers/:type",
       {
         preValidation: (request, reply, done) => {
           const { type } = request.params as { type: string };
 
-          const providerTypes = Object.keys(PROVIDERS_LIST).map((element) =>
-            element.toLowerCase()
-          );
+          const providerTypes = Object.keys(EXTENSION_LIST).map((element) => element.toLowerCase());
 
           if (type === undefined) {
             reply.status(400);
-            done(
-              new Error(
-                "Type must not be empty. Available types: " +
-                  providerTypes.toString()
-              )
-            );
+            done(new Error("Type must not be empty. Available types: " + providerTypes.toString()));
           }
 
           if (!providerTypes.includes(type.toLowerCase())) {
@@ -45,16 +30,24 @@ export default class Providers {
       },
       async (request: ProvidersRequest, reply: FastifyReply) => {
         let { type } = request.params as {
-          type: keyof typeof PROVIDERS_LIST;
+          type: keyof typeof EXTENSION_LIST;
         };
 
-        type = type.toUpperCase() as keyof typeof PROVIDERS_LIST;
+        type = type.toUpperCase() as keyof typeof EXTENSION_LIST;
 
-        const providers = Object.values(PROVIDERS_LIST[type]).sort((one, two) =>
-          one.name.localeCompare(two.name)
+        const providers = Object.values(EXTENSION_LIST[type]).sort((one, two) =>
+          one.metaData.name.localeCompare(two.metaData.name)
         );
 
-        reply.status(200).send(providers.map((element) => element.toString));
+        reply.status(200).send(
+          providers.map((element) => ({
+            name: element.metaData.name.toLowerCase(),
+            type: element.metaData.type.toUpperCase(),
+            version: element.metaData.version,
+            image: element.metaData.image,
+            author: element.metaData.author,
+          }))
+        );
       }
     );
   };
