@@ -57,6 +57,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
     let anilist = generateAnilistMeta(provider);
 
     if (isDub === "true" || isDub === "1" || isDub === "dub") isDub = true;
+    else if (provider?.toLowerCase()?.includes("animepahe")) isDub = false;
     else isDub = false;
 
     if (fetchFiller === "true" || fetchFiller === "1") fetchFiller = true;
@@ -72,7 +73,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       data = data ? data : await anilist.getMediaInfo(id, isDub);
 
       if (isDub && provider?.toLowerCase()?.includes("animepahe") && data?.episodes?.length >= 1) {
-        data.episodes = data.episodes?.filter((e: any) => e.hasDub);
+        data.episodes = data?.episodes?.filter((e: any) => e.hasDub === true);
       }
 
       return reply.code(200).send(data);
