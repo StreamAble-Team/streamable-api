@@ -27,6 +27,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
    * UTILS
    */
   await fastify.register(new Providers().getProviders);
+  await fastify.register(new Providers().getAppExtensions);
 };
 
 export default routes;

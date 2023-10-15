@@ -78,3 +78,9 @@ export interface ITvResult extends IMediaResult {
   id: number;
   title: ITitle;
 }
+
+export type DropdownData = {
+  label: string;
+  value: string;
+  image?: string;
+};

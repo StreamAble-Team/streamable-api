@@ -269,7 +269,7 @@ ansi-styles@^4.1.0:
 
 "apollotv-providers@git+https://github.com/TDanks2000/apollotv-extensions.git":
   version "1.0.1"
-  resolved "git+https://github.com/TDanks2000/apollotv-extensions.git#6ccb0e01d7d2adfbfdc669f732e4ca2b0df4acbd"
+  resolved "git+https://github.com/TDanks2000/apollotv-extensions.git#6a49182b81fca2a98fed5180804f30189692d589"
   dependencies:
     "@tdanks2000/anilist-wrapper" "^1.0.18"
     axios "0.27.2"
@@ -713,9 +713,9 @@ fastify-socket.io@^5.0.0:
     tslib "^2.6.1"
 
 fastify@^4.21.0:
-  version "4.24.1"
-  resolved "https://registry.yarnpkg.com/fastify/-/fastify-4.24.1.tgz#b386ab914d6898270f8f082ef5940059b346acf6"
-  integrity sha512-uMthXpH0DjWWxb3/ERmBsVkFm5cllozjbOFkhsD4Xlw+OUg5wGASRBjVRcp2XeYZa91W2BbwgIWJrnGGPWY2dQ==
+  version "4.24.2"
+  resolved "https://registry.yarnpkg.com/fastify/-/fastify-4.24.2.tgz#fad5d42b1abd112aac6ee699e40fec13a2bcbfa8"
+  integrity sha512-V/7fdhFas7HoAyjD8ha8wPCeiRLUzPgwwM5dSSUx/eBUv7GvG61YzjggqOchMOsa7Sw32MNN4uCCoFrl+9ccJA==
   dependencies:
     "@fastify/ajv-compiler" "^3.5.0"
     "@fastify/error" "^3.4.0"
