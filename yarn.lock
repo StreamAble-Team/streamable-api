@@ -269,7 +269,7 @@ ansi-styles@^4.1.0:
 
 "apollotv-providers@git+https://github.com/TDanks2000/apollotv-extensions.git":
   version "1.0.1"
-  resolved "git+https://github.com/TDanks2000/apollotv-extensions.git#6a49182b81fca2a98fed5180804f30189692d589"
+  resolved "git+https://github.com/TDanks2000/apollotv-extensions.git#91a44d41c330dbadbbaeefcd3141d278bdcbb328"
   dependencies:
     "@tdanks2000/anilist-wrapper" "^1.0.18"
     axios "0.27.2"

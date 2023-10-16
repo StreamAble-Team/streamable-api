@@ -66,11 +66,15 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
     try {
       let data = await cache.fetch(
         `anilist:info;${id};${isDub};${fetchFiller};${anilist.provider.metaData.name.toLowerCase()}`,
-        async () => await anilist.getMediaInfo(id, isDub as boolean),
+        async () => await anilist.getMediaInfo(id, isDub as boolean, fetchFiller as boolean),
         today === 0 || today === 6 ? 60 * 120 : (60 * 60) / 2
       );
 
-      data = data ? data : await anilist.getMediaInfo(id, isDub);
+      console.log(
+        `anilist:info;${id};${isDub};${fetchFiller};${anilist.provider.metaData.name.toLowerCase()}`
+      );
+
+      data = data ? data : await anilist.getMediaInfo(id, isDub, fetchFiller);
 
       if (isDub && provider?.toLowerCase()?.includes("animepahe") && data?.episodes?.length >= 1) {
         data.episodes = data?.episodes?.filter((e: any) => e.hasDub === true);
