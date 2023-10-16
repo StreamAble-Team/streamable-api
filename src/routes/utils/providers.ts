@@ -111,8 +111,8 @@ export default class Providers {
 
         reply.status(200).send(
           providers.map((element, i) => ({
-            value: element.metaData.name.toLowerCase(),
-            label: (i + 1).toString(),
+            label: element.metaData.name.toLowerCase(),
+            value: (i + 1).toString(),
             image: element.metaData.image,
           }))
         );
