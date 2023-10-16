@@ -70,10 +70,6 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
         today === 0 || today === 6 ? 60 * 120 : (60 * 60) / 2
       );
 
-      console.log(
-        `anilist:info;${id};${isDub};${fetchFiller};${anilist.provider.metaData.name.toLowerCase()}`
-      );
-
       data = data ? data : await anilist.getMediaInfo(id, isDub, fetchFiller);
 
       if (isDub && provider?.toLowerCase()?.includes("animepahe") && data?.episodes?.length >= 1) {
