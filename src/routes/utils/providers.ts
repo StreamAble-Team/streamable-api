@@ -110,16 +110,13 @@ export default class Providers {
         );
 
         reply.status(200).send(
-          providers
-            .map((element, i) => {
-              if (element?.metaData.name.toLowerCase().includes("allanime")) return;
-              return {
-                label: element.metaData.name.toLowerCase(),
-                value: (i + 1).toString(),
-                image: element.metaData.image,
-              };
-            })
-            .filter((el) => el?.label)
+          providers.map((element, i) => {
+            return {
+              label: element.metaData.name.toLowerCase(),
+              value: (i + 1).toString(),
+              image: element.metaData.image,
+            };
+          })
         );
       }
     );
