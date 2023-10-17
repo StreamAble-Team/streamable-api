@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "update": "git pull && yarn add git+https://github.com/TDanks2000/apollotv-extensions.git && pm2 restart api.streamable.moe",
+    "update:apollo": "yarn add git+https://github.com/TDanks2000/apollotv-extensions.git",
     "start": "tsc && node ./dist/main.js",
     "dev": "chcp 65001 && nodemon ./src/main.ts "
   },
