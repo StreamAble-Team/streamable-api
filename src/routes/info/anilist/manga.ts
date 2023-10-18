@@ -1,5 +1,4 @@
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from "fastify";
-import { PROVIDERS_LIST } from "@consumet/extensions";
 
 import { EXTENSION_LIST, INFO, MANGA } from "apollotv-providers";
 import { IReadableResult, ISearch, MediaStatus } from "apollotv-providers/dist/types";
