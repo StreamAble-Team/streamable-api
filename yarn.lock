@@ -129,9 +129,9 @@
     abort-controller "^3.0.0"
 
 "@tdanks2000/anilist-wrapper@^1.0.18":
-  version "1.0.21"
-  resolved "https://registry.yarnpkg.com/@tdanks2000/anilist-wrapper/-/anilist-wrapper-1.0.21.tgz#9ed2a2008ead8a0ac25a663880581ac63aee9778"
-  integrity sha512-UaiMhoRCxvRNOebvRPVrWjanutFj19HBVrATRrQNeB4ELD6L4Anms/0L5ZqoCzxUKd/YggA5FIl6jngxnGOF3g==
+  version "1.0.22"
+  resolved "https://registry.yarnpkg.com/@tdanks2000/anilist-wrapper/-/anilist-wrapper-1.0.22.tgz#4f09e8ffcaa1924c21ed0bb95e675e4c7a88c994"
+  integrity sha512-4p9eQkAnPHk46o3ozUDqRoGQipWsFkSIdJtyZ0fmGc+LDO8IFoD9YKfjgZJWU1wHwbBA0edKvF7x9qy63B0jHA==
   dependencies:
     abort-controller "^3.0.0"
 
@@ -164,9 +164,9 @@
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
 "@types/bcrypt@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@types/bcrypt/-/bcrypt-5.0.0.tgz#a835afa2882d165aff5690893db314eaa98b9f20"
-  integrity sha512-agtcFKaruL8TmcvqbndlqHPSJgsolhf/qPWchFlgnW1gECTN/nKbFcoFnvKAQRFfKbh+BO6A3SWdJu9t+xF3Lw==
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@types/bcrypt/-/bcrypt-5.0.1.tgz#50a6a662ad6a14c44ae7b25633cfadddf7a85f45"
+  integrity sha512-dIIrEsLV1/v0AUNI8oHMaRRTSeVjoy5ID8oclJavtPj8CwPJoD1eFoNXEypuu6k091brEzBeOo3LlxeAH9zRZg==
   dependencies:
     "@types/node" "*"
 
@@ -176,23 +176,23 @@
   integrity sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==
 
 "@types/cors@^2.8.12":
-  version "2.8.14"
-  resolved "https://registry.yarnpkg.com/@types/cors/-/cors-2.8.14.tgz#94eeb1c95eda6a8ab54870a3bf88854512f43a92"
-  integrity sha512-RXHUvNWYICtbP6s18PnOCaqToK8y14DnLd75c6HfyKf228dxy7pHNOQkxPtvXKp/hINFMDjbYzsj63nnpPMSRQ==
+  version "2.8.15"
+  resolved "https://registry.yarnpkg.com/@types/cors/-/cors-2.8.15.tgz#eb143aa2f8807ddd78e83cbff141bbedd91b60ee"
+  integrity sha512-n91JxbNLD8eQIuXDIChAN1tCKNWCEgpceU9b7ZMbFA+P+Q4yIeh80jizFLEvolRPc1ES0VdwFlGv+kJTSirogw==
   dependencies:
     "@types/node" "*"
 
 "@types/jsonwebtoken@^9.0.3":
-  version "9.0.3"
-  resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-9.0.3.tgz#1f22283b8e1f933af9e195d720798b64b399d84c"
-  integrity sha512-b0jGiOgHtZ2jqdPgPnP6WLCXZk1T8p06A/vPGzUvxpFGgKMbjXJDjC5m52ErqBnIuWZFgGoIJyRdeG5AyreJjA==
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-9.0.4.tgz#8b74bbe87bde81a3469d4b32a80609bec62c23ec"
+  integrity sha512-8UYapdmR0QlxgvJmyE8lP7guxD0UGVMfknsdtCFZh4ovShdBl3iOI4zdvqBHrB/IS+xUj3PSx73Qkey1fhWz+g==
   dependencies:
     "@types/node" "*"
 
 "@types/node@*", "@types/node@>=10.0.0", "@types/node@^20.8.2":
-  version "20.8.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.6.tgz#0dbd4ebcc82ad0128df05d0e6f57e05359ee47fa"
-  integrity sha512-eWO4K2Ji70QzKUqRy6oyJWUeB7+g2cRagT3T/nxYibYcT4y2BDL8lqolRXjTHmkZCdJfIPaY73KbJAZmcryxTQ==
+  version "20.8.7"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.7.tgz#ad23827850843de973096edfc5abc9e922492a25"
+  integrity sha512-21TKHHh3eUHIi2MloeptJWALuCu5H7HQTdTrWIFReA8ad+aggoX+lRes3ex7/FtpC+sVUpFMQ+QTfYr74mruiQ==
   dependencies:
     undici-types "~5.25.1"
 
@@ -268,8 +268,8 @@ ansi-styles@^4.1.0:
     color-convert "^2.0.1"
 
 "apollotv-providers@git+https://github.com/TDanks2000/apollotv-extensions.git":
-  version "1.0.1"
-  resolved "git+https://github.com/TDanks2000/apollotv-extensions.git#1394e8661cd78e14a77d59ee15d90466bd68fc88"
+  version "1.0.2"
+  resolved "git+https://github.com/TDanks2000/apollotv-extensions.git#ab0e5185a5c0cddc3cc4a212e6754938b7120807"
   dependencies:
     "@tdanks2000/anilist-wrapper" "^1.0.18"
     ascii-url-encoder "^1.2.0"

@@ -1,17 +1,15 @@
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from "fastify";
-import { META, MediaStatus, IMangaResult, ISearch, MANGA } from "@consumet/extensions";
 import { PROVIDERS_LIST } from "@consumet/extensions";
 
-import { INFO } from "apollotv-providers";
+import { EXTENSION_LIST, INFO, MANGA } from "apollotv-providers";
+import { IReadableResult, ISearch, MediaStatus } from "apollotv-providers/dist/types";
 import { Anilist } from "@tdanks2000/anilist-wrapper";
 
 import { cache } from "../../../utils";
 
 const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
-  let anilist = new META.Anilist.Manga(new MANGA.MangaDex());
+  let anilist = new INFO.Anilist.Manga(new MANGA.MangaDex());
   let anilistD = new Anilist().search;
-
-  let anilistA = new INFO.Anilist().Manga;
 
   fastify.get("/search/:query", async (request: FastifyRequest, reply: FastifyReply) => {
     let { query } = request.params as { query: string };
@@ -44,37 +42,26 @@ const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
 
     if (!id) return reply.code(400).send({ error: "ID parameter is required" });
 
-    const isMangaSee =
-      (typeof provider !== "undefined" && provider.toLowerCase().includes("mangasee")) ||
-      anilist.provider.name.toLowerCase().includes("mangasee");
-
     if (typeof provider !== "undefined") {
-      if (!isMangaSee) {
-        const possibleProvider = PROVIDERS_LIST.MANGA.find(
-          (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
-        );
-        anilist = new META.Anilist.Manga(possibleProvider);
-      }
+      const possibleProvider = EXTENSION_LIST.MANGA.find(
+        (p) => p.metaData.name.toLowerCase() === provider.toLocaleLowerCase()
+      );
+      anilist = new INFO.Anilist.Manga(possibleProvider);
     }
 
     try {
       let data = await cache.fetch(
-        `anilist:manga:info;${id};${anilist.provider.name.toLowerCase()}`,
-        async () =>
-          isMangaSee ? await anilistA.getMediaInfo(id) : await anilist.fetchMangaInfo(id),
+        `anilist:manga:info;${id};${anilist.provider.metaData.name.toLowerCase()}`,
+        async () => await anilist.getMediaInfo(id),
         today === 0 || today === 6 ? 60 * 120 : (60 * 60) / 2
       );
 
-      let res = data
-        ? data
-        : isMangaSee
-        ? await anilistA.getMediaInfo(id)
-        : await anilist.fetchMangaInfo(id);
+      let res = data ? data : await anilist.getMediaInfo(id);
 
       reply.code(200).send(res);
-      anilist = new META.Anilist.Manga();
-      anilistA = new INFO.Anilist().Manga;
+      anilist = new INFO.Anilist.Manga(new MANGA.MangaDex());
     } catch (err) {
+      console.log(err);
       reply.status(500).send({ error: err ?? "Unkown Error" });
     }
   });
@@ -195,49 +182,41 @@ const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
 
     if (!chapterId) return reply.code(400).send({ error: "Chapter ID is required" });
 
-    const isMangaSee =
-      (typeof provider !== "undefined" && provider.toLowerCase().includes("mangasee")) ||
-      anilist.provider.name.toLowerCase().includes("mangasee");
-
     if (typeof provider !== "undefined") {
-      if (!isMangaSee) {
-        const possibleProvider = PROVIDERS_LIST.MANGA.find(
-          (p) => p.name.toLowerCase() === provider.toLocaleLowerCase()
-        );
-        anilist = new META.Anilist.Manga(possibleProvider);
-      }
+      const possibleProvider = EXTENSION_LIST.MANGA.find(
+        (p) => p.metaData.name.toLowerCase() === provider.toLocaleLowerCase()
+      );
+      anilist = new INFO.Anilist.Manga(possibleProvider);
     }
 
     try {
       let data = await cache.fetch(
-        `anilist:manga:read;${chapterId};${anilist.provider.name.toLowerCase()}`,
-        async () =>
-          isMangaSee
-            ? await anilistA.getChapterPages(chapterId)
-            : await anilist.fetchChapterPages(chapterId),
+        `anilist:manga:read;${chapterId};${anilist.provider.metaData.name.toLowerCase()}`,
+        async () => await anilist.getChapterPages(chapterId),
         600
       );
 
-      let res = data
-        ? data
-        : isMangaSee
-        ? await anilistA.getChapterPages(chapterId)
-        : await anilist.fetchChapterPages(chapterId);
+      console.log(
+        `anilist:manga:read;${chapterId};${anilist.provider.metaData.name.toLowerCase()}`
+      );
+
+      let res = data ? data : await anilist.getChapterPages(chapterId);
 
       reply.code(200).send(res);
-      anilist = new META.Anilist.Manga();
+      anilist = new INFO.Anilist.Manga(new MANGA.MangaDex());
     } catch (err) {
+      console.log(err);
       reply.status(500).send({ error: err });
     }
   });
 };
 
 const convert_result = (data: any) => {
-  const res: ISearch<IMangaResult> = {
+  const res: ISearch<IReadableResult> = {
     currentPage: data.data.Page.pageInfo.currentPage,
     hasNextPage: data.data.Page.pageInfo.hasNextPage,
     results: data.data.Page.media.map(
-      (item: any): IMangaResult => ({
+      (item: any): IReadableResult => ({
         id: item.id.toString(),
         malId: item.idMal,
         title:
