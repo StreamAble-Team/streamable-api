@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from "fastify";
-import { META, MediaStatus, IMangaResult, ISearch } from "@consumet/extensions";
+import { META, MediaStatus, IMangaResult, ISearch, MANGA } from "@consumet/extensions";
 import { PROVIDERS_LIST } from "@consumet/extensions";
 
 import { INFO } from "apollotv-providers";
@@ -8,7 +8,7 @@ import { Anilist } from "@tdanks2000/anilist-wrapper";
 import { cache } from "../../../utils";
 
 const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
-  let anilist = new META.Anilist.Manga();
+  let anilist = new META.Anilist.Manga(new MANGA.MangaDex());
   let anilistD = new Anilist().search;
 
   let anilistA = new INFO.Anilist().Manga;
@@ -75,7 +75,7 @@ const routes = async (fastify: FastifyInstance, opts: RegisterOptions) => {
       anilist = new META.Anilist.Manga();
       anilistA = new INFO.Anilist().Manga;
     } catch (err) {
-      reply.status(500).send({ error: err });
+      reply.status(500).send({ error: err ?? "Unkown Error" });
     }
   });
 
