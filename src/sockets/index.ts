@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { app } from "../utils";
 import { Server } from "socket.io";
 
@@ -31,8 +33,8 @@ app.addHook("onClose", (instance, done) => {
   done();
 });
 
-declare module "fastify" {
-  interface FastifyInstance {
-    io: Server;
-  }
-}
+// declare module "fastify" {
+//   interface FastifyInstance {
+//     io: Server;
+//   }
+// }
